@@ -236,4 +236,5 @@ function pushRow(relative, ruling, cash) {
     tableBody.innerHTML += row;
 }
 
+
 window.onload = calculateInheritance;
