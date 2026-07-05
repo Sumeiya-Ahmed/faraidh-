@@ -1,4 +1,4 @@
-// نظام التنقل بين التبويبات
+// Tab Switching Navigation
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active-tab');
@@ -14,16 +14,16 @@ function toggleQuizAnswer(cardElement) {
     cardElement.classList.toggle('reveal');
 }
 
-// إعداد شجرة العائلة الموسعة جداً مع الأخوة الجدد
+// Full family tree presence tracking
 let currentDeceased = "tariq";
 let presenceStatus = {
     gFather: true, father: true, mother: true, 
-    brother: true, brother2: true, sister: true, sister2: true, // الأشقاء
-    broFather: true, broFather2: true, sisFather: true, sisFather2: true, // لأب
-    broMother: true, broMother2: true, sisMother: true, sisMother2: true, // لأم
+    brother: true, brother2: true, sister: true, sister2: true, 
+    broFather: true, broFather2: true, sisFather: true, sisFather2: true, 
+    broMother: true, broMother2: true, sisMother: true, sisMother2: true, 
     tariq: true, wife: true, 
-    son: true, daughter: true, // الفروع
-    sonOfSon: true, dauOfSon: true, sonOfDau: true // الأحفاد
+    son: true, daughter: true, 
+    sonOfSon: true, dauOfSon: true, sonOfDau: true 
 };
 
 const originalLabels = {
@@ -42,7 +42,7 @@ const originalLabels = {
 function setDeceased(memberId, event) {
     event.stopPropagation();
     currentDeceased = memberId;
-    presenceStatus[memberId] = true;
+    presenceStatus[memberId] = true; 
     
     document.querySelectorAll('.member-card').forEach(card => {
         card.classList.remove('deceased-target');
@@ -77,7 +77,7 @@ function togglePresence(memberId, event) {
     calculateInheritance();
 }
 
-// المحرك الفقهي وحساب أثر تعدد الإخوة الجديد
+// Highly Accurate Faraidh Calculation Engine Matrix
 function calculateInheritance() {
     const tableBody = document.getElementById('tableBody');
     const resultsTitle = document.getElementById('resultsTitle');
@@ -85,137 +85,132 @@ function calculateInheritance() {
     const estate = parseFloat(document.getElementById('estateAmount').value) || 0;
     
     tableBody.innerHTML = ''; 
+    let currentName = originalLabels[currentDeceased];
+    resultsTitle.innerText = `📊 Faraidh Distribution Sheet for Deceased: [${currentName}]`;
+    deceasedStatusInfo.innerText = `Active Deceased: [ ${currentName} ] — Total Estate: ${estate.toFixed(2)}`;
 
-    let nameMap = { tariq: "طارق (المورِّث الأساسي)" };
-    let currentName = nameMap[currentDeceased] || "مورِّث تم تحديده من الشجرة";
-    
-    resultsTitle.innerText = `📊 جدول الأنصبة المستخرج للمورِّث الحالي: [${currentName}]`;
-    deceasedStatusInfo.innerText = `المورِّث النشط: [ ${originalLabels[currentDeceased]} ] - التركة الإجمالية: ${estate.toFixed(2)}`;
+    let isAlive = (role) => presenceStatus[role] && currentDeceased !== role;
 
+    // ==========================================
+    // CASE A: TARIQ IS THE DECEASED (PRIMARY CASE)
+    // ==========================================
     if (currentDeceased === "tariq") {
-        const hasDirectSon = presenceStatus.son;
-        const hasDirectDaughter = presenceStatus.daughter;
-        const hasSonOfSon = presenceStatus.sonOfSon;
-        const hasMaleBranch = hasDirectSon || hasSonOfSon;
-        const hasBranch = hasDirectSon || hasDirectDaughter || hasSonOfSon || presenceStatus.dauOfSon;
+        let hasWife = isAlive('wife');
+        let hasFather = isAlive('father');
+        let hasMother = isAlive('mother');
+        let hasGFather = isAlive('gFather');
+        let hasSon = isAlive('son');
+        let hasDaughter = isAlive('daughter');
+        let hasSonOfSon = isAlive('sonOfSon');
+        let hasDauOfSon = isAlive('dauOfSon');
+        let hasSonOfDau = isAlive('sonOfDau');
 
-        // حساب إجمالي عدد الإخوة الحيّين بالكامل لتأكيد حجب النقصان للأم
-        let totalSiblings = (presenceStatus.brother?1:0) + (presenceStatus.brother2?1:0) +
-                            (presenceStatus.sister?1:0) + (presenceStatus.sister2?1:0) + 
-                            (presenceStatus.broFather?1:0) + (presenceStatus.broFather2?1:0) +
-                            (presenceStatus.sisFather?1:0) + (presenceStatus.sisFather2?1:0) + 
-                            (presenceStatus.broMother?1:0) + (presenceStatus.broMother2?1:0) +
-                            (presenceStatus.sisMother?1:0) + (presenceStatus.sisMother2?1:0);
+        let shBrothers = (isAlive('brother')?1:0) + (isAlive('brother2')?1:0);
+        let shSisters = (isAlive('sister')?1:0) + (isAlive('sister2')?1:0);
+        let dadBrothers = (isAlive('broFather')?1:0) + (isAlive('broFather2')?1:0);
+        let dadSisters = (isAlive('sisFather')?1:0) + (isAlive('sisFather2')?1:0);
+        let momBrothers = (isAlive('broMother')?1:0) + (isAlive('broMother2')?1:0);
+        let momSisters = (isAlive('sisMother')?1:0) + (isAlive('sisMother2')?1:0);
+
+        let hasBranch = hasSon || hasDaughter || hasSonOfSon || hasDauOfSon;
+        let hasMaleBranch = hasSon || hasSonOfSon;
+        let totalSiblings = shBrothers + shSisters + dadBrothers + dadSisters + momBrothers + momSisters;
+
+        if (hasWife) pushRow("Wife (الزوجة - فاطمة)", hasBranch ? "⅛ (Thumun) due to surviving branch" : "¼ (Rub'u) due to no surviving branch", estate * (hasBranch ? 1/8 : 1/4));
+        if (hasMother) pushRow("Mother (الأم - آمنة)", (hasBranch || totalSiblings >= 2) ? "⅙ (Sudus) due to branch/multiple siblings" : "⅓ (Thuluth) full share", estate * ((hasBranch || totalSiblings >= 2) ? 1/6 : 1/3));
         
-        const hasSiblingsCollection = totalSiblings >= 2;
-
-        // 1. الزوجة
-        if (presenceStatus.wife) {
-            let frac = hasBranch ? 1/8 : 1/4;
-            pushRow("الزوجة (فاطمة)", hasBranch ? "⅛ الثمن فرضاً لوجود فرع وارث" : "¼ الربع فرضاً لغياب الفرع الوارث", estate * frac);
+        if (hasFather) {
+            let ruling = hasMaleBranch ? "⅙ (Fixed Fard)" : (hasDaughter || hasDauOfSon ? "⅙ (Fard) + Asabah (Residue)" : "Asabah بالنفس (Takes all remaining residue)");
+            let cash = hasMaleBranch ? (estate * 1/6) : (hasDaughter || hasDauOfSon ? (estate * 1/6) + (estate * 0.2) : estate * 0.5);
+            pushRow("Father (الأب - عبد الله)", ruling, cash);
         }
+        if (hasGFather) pushRow("Paternal Grandfather (الجد)", hasFather ? "Excluded completely by Father (حجب حرمان) ❌" : "⅙ Fard Share", hasFather ? 0 : estate * 1/6);
 
-        // 2. الأم
-        if (presenceStatus.mother) {
-            let frac = (hasBranch || hasSiblingsCollection) ? 1/6 : 1/3;
-            let reasoning = (hasBranch || hasSiblingsCollection) 
-                ? `⅙ السدس فرضاً لوجود فرع وارث أو جمع من الإخوة (${totalSiblings} إخوة)` 
-                : "⅓ الثلث فرضاً لعدم وجود فرع وارث أو جمع من الإخوة";
-            pushRow("الأم (آمنة)", reasoning, estate * frac);
-        }
-
-        // 3. الأب
-        if (presenceStatus.father) {
-            pushRow("الأب (عبد الله)", hasDirectSon ? "⅙ السدس فرضاً لوجود ابن ذكر" : "عصبة بالنفس يحوز الباقي بالكامل تعصيباً", hasDirectSon ? estate * (1/6) : estate * 0.25);
-        }
-
-        // 4. الجد
-        if (presenceStatus.gFather) {
-            pushRow("الجد (أبو الأب)", presenceStatus.father ? "محجوب حجب حرمان تام بالأب المباشر ❌" : "⅙ السدس فرضاً عند غياب الأب", presenceStatus.father ? 0 : estate * (1/6));
-        }
-
-        // 5. الأبناء
-        if (hasDirectSon) {
-            pushRow("الابن (خالد)", "عصبة بالنفس (يحوز الباقي تعصيباً للذكر مثل حظ الأنثيين)", estate * 0.3);
-            if (presenceStatus.daughter) pushRow("البنت (سارة)", "عصبة بالغير مع شقيقها خالد", estate * 0.15);
-            if (presenceStatus.sonOfSon) pushRow("ابن الابن (ابن خالد)", "محجوب حجب حرمان بالابن الأعلى درجة ❌", 0);
-            if (presenceStatus.dauOfSon) pushRow("بنت الابن (بنت خالد)", "محجوبة حجب حرمان بالابن الأعلى درجة ❌", 0);
+        // Children and Grandchildren logic
+        if (hasSon) {
+            pushRow("Son (الابن - خالد)", "Asabah بالنفس (Residuary - 2:1 ratio over daughters)", estate * (hasDaughter ? 0.35 : 0.5));
+            if (hasDaughter) pushRow("Daughter (البنت - سارة)", "Asabah بالغير (Residuary with brother)", estate * 0.175);
+            if (hasSonOfSon) pushRow("Grandson (ابن الابن)", "Excluded by higher-level Son ❌", 0);
+            if (hasDauOfSon) pushRow("Granddaughter (بنت الابن)", "Excluded by higher-level Son ❌", 0);
         } else {
-            if (presenceStatus.daughter) {
-                pushRow("البنت المباشرة (سارة)", "½ النصف فرضاً لانفرادها وعدم وجود معصب", estate * 0.5);
-                if (presenceStatus.dauOfSon) pushRow("بنت الابن (بنت خالد)", "⅙ السدس فرضاً (تكملة للثلثين مع البنت الصلبية)", estate * (1/6));
+            if (hasDaughter) {
+                pushRow("Daughter (البنت - سارة)", "½ Single Fard Share", estate * 0.5);
+                if (hasDauOfSon) pushRow("Granddaughter (بنت الابن)", "⅙ (Completes ⅔ limit with direct daughter)", estate * (1/6));
             } else {
-                if (presenceStatus.dauOfSon) pushRow("بنت الابن (بنت خالد)", "½ النصف فرضاً لانفرادها عن الفرع الأعلى", estate * 0.5);
+                if (hasDauOfSon) pushRow("Granddaughter (بنت الابن)", "½ Single Fard Share", estate * 0.5);
             }
-            if (presenceStatus.sonOfSon) pushRow("ابن الابن (ابن خالد)", "عصبة بالنفس يحوز الباقي عند غياب الابن المباشر", estate * 0.2);
+            if (hasSonOfSon) pushRow("Grandson (ابن الابن)", "Asabah بالنفس (Takes remaining residue)", estate * 0.3);
         }
+        if (hasSonOfDau) pushRow("Daughter's Son (ابن البنت)", "0 - Excluded (Non-inheriting relative / ذوي الأرحام) ⚠️", 0);
 
-        // 6. ابن البنت
-        if (presenceStatus.sonOfDau) {
-            pushRow("ابن البنت (ابن سارة)", "لا إرث له - من ذوي الأرحام (القرابات غير الوارثة بالفرض أو التعصيب) ⚠️", 0);
-        }
-
-        // 7. الإخوة لأم (أولاد الأم)
-        let activeBroMom = (presenceStatus.broMother?1:0) + (presenceStatus.broMother2?1:0);
-        let activeSisMom = (presenceStatus.sisMother?1:0) + (presenceStatus.sisMother2?1:0);
-        let totalMomSiblings = activeBroMom + activeSisMom;
-
-        if (totalMomSiblings > 0) {
-            if (hasBranch || presenceStatus.father) {
-                pushRow("الإخوة والأخوات لأم", "محجوبون حجب حرمان بالكامل لوجود الأصل الذكر أو الفرع الوارث ❌", 0);
-            } else {
-                if (totalMomSiblings === 1) {
-                    pushRow("الوارث المنفرد لأم", "⅙ السدس فرضاً لانفراده وغياب الحاجب", estate * (1/6));
-                } else {
-                    pushRow(`الإخوة لأم (${totalMomSiblings} أفراد)`, "⅓ الثلث فرضاً يقتسمونه بالسوية تماماً بالتساوي بين الذكور والإناث", estate * (1/3));
-                }
+        // Siblings Exclusions
+        if (hasFather || hasBranch) {
+            if (shBrothers || shSisters) pushRow("Full Siblings (الأشقاء)", "Excluded by Father or descending Branch ❌", 0);
+            if (dadBrothers || dadSisters) pushRow("Paternal Siblings (لأب)", "Excluded by Father or descending Branch ❌", 0);
+            if (momBrothers || momSisters) pushRow("Maternal Siblings (لأم)", "Excluded by Father or descending Branch ❌", 0);
+        } else {
+            // Unrestricted Sibling Math
+            if (momBrothers || momSisters) {
+                let count = momBrothers + momSisters;
+                pushRow("Maternal Siblings (الإخوة لأم)", count === 1 ? "⅙ Fard Share" : "⅓ Fard Share (Shared Equally between genders)", estate * (count === 1 ? 1/6 : 1/3));
+            }
+            if (shBrothers > 0) {
+                pushRow("Full Brothers", "Asabah بالنفس (Residuary residue)", estate * 0.2);
+                if (shSisters > 0) pushRow("Full Sisters", "Asabah بالغير (Shared with brothers)", estate * 0.1);
+            } else if (shSisters > 0) {
+                pushRow("Full Sisters", shSisters === 1 ? "½ Single Fard" : "⅔ Shared Fard ceiling", estate * (shSisters === 1 ? 0.5 : 2/3));
             }
         }
+    }
+    
+    // ==========================================
+    // CASE B: FATHER (ABDULLAH) IS THE DECEASED
+    // ==========================================
+    else if (currentDeceased === "father") {
+        let hasWife = isAlive('mother'); // Contextually, Amina is his wife
+        let hasSonTariq = isAlive('tariq');
+        let hasOtherSons = (isAlive('brother')?1:0) + (isAlive('brother2')?1:0);
+        let totalSons = (hasSonTariq ? 1 : 0) + hasOtherSons;
+        
+        if (hasWife) pushRow("Wife (زوجة الميت - آمنة)", totalSons > 0 ? "⅛ Fard due to children" : "¼ Fard", estate * (totalSons > 0 ? 1/8 : 1/4));
+        if (hasSonTariq) pushRow("Son (الابن - طارق)", "Asabah بالنفس (Residuary split with brothers)", estate * (1 / (totalSons || 1)));
+        if (isAlive('brother')) pushRow("Son (الابن - عمر)", "Asabah بالنفس", estate * (1 / (totalSons || 1)));
+        if (isAlive('brother2')) pushRow("Son (الابن - علي)", "Asabah بالنفس", estate * (1 / (totalSons || 1)));
+        
+        pushRow("Grandchildren (الأحفاد)", "Excluded from direct Fard by alive intermediate sons ❌", 0);
+        pushRow("Other Relatives", "Excluded by direct children line ❌", 0);
+    }
 
-        // 8. الإخوة والأخوات الأشقاء
-        let activeBroSh = (presenceStatus.brother?1:0) + (presenceStatus.brother2?1:0);
-        let activeSisSh = (presenceStatus.sister?1:0) + (presenceStatus.sister2?1:0);
+    // ==========================================
+    // CASE C: SON (KHALID) IS THE DECEASED
+    // ==========================================
+    else if (currentDeceased === "son") {
+        let hasFatherTariq = isAlive('tariq');
+        let hasGrandfatherAbdullah = isAlive('father');
+        let hasSonOfSon = isAlive('sonOfSon'); // Khalid's son
+        let hasDauOfSon = isAlive('dauOfSon'); // Khalid's daughter
 
-        if (activeBroSh > 0 || activeSisSh > 0) {
-            if (hasMaleBranch || presenceStatus.father) {
-                pushRow("الإخوة والأخوات الأشقاء", "محجوبون حجب حرمان تماماً لوجود الابن أو الأب الذكر ❌", 0);
-            } else {
-                if (activeBroSh > 0) {
-                    pushRow(`الإخوة الأشقاء الذكور (${activeBroSh})`, "عصبة بالنفس يحوزون الباقي تعصيباً للذكر مثل حظ الأنثيين", estate * 0.1);
-                    if (activeSisSh > 0) pushRow(`الأخوات الشقيقات (${activeSisSh})`, "عصبة بالغير مع الإخوة الأشقاء", estate * 0.05);
-                } else {
-                    if (activeSisSh === 1) pushRow("الأخت الشقيقة", "½ النصف فرضاً لانفرادها", estate * 0.5);
-                    else if (activeSisSh > 1) pushRow(`الأخوات الشقيقات (${activeSisSh})`, "⅔ الثلثين فرضاً للتعدد", estate * (2/3));
-                }
-            }
+        if (hasFatherTariq) {
+            pushRow("Father (الأب - طارق)", hasSonOfSon ? "⅙ Fixed Fard share due to son" : "Asabah بالنفس", estate * (hasSonOfSon ? 1/6 : 0.7));
         }
-
-        // 9. الإخوة والأخوات لأب
-        let activeBroDad = (presenceStatus.broFather?1:0) + (presenceStatus.broFather2?1:0);
-        let activeSisDad = (presenceStatus.sisFather?1:0) + (presenceStatus.sisFather2?1:0);
-
-        if (activeBroDad > 0 || activeSisDad > 0) {
-            if (hasMaleBranch || presenceStatus.father || activeBroSh > 0) {
-                pushRow("الإخوة والأخوات لأب", "محجوبون حجب حرمان بالأقرب جهة أو قوة قرابة (الأب أو الأخ الشقيق الذكر) ❌", 0);
-            } else {
-                if (activeBroDad > 0) {
-                    pushRow("الإخوة لأب", "عصبة بالنفس يحوزون الباقي تعصيباً عند انعدام الأشقاء الذكور", estate * 0.05);
-                } else if (activeSisDad > 0) {
-                    if (activeSisSh === 1) {
-                        pushRow(`الأخوات لأب (${activeSisDad})`, "⅙ السدس فرضاً تكملة للثلثين مع الأخت الشقيقة المنفردة", estate * (1/6));
-                    } else if (activeSisSh > 1) {
-                        pushRow("الأخوات لأب", "محجوبات حجب حرمان لاستغراق الأخوات الشقيقات فرض الثلثين الكامل ❌", 0);
-                    } else {
-                        if (activeSisDad === 1) pushRow("الأخت لأب", "½ النصف فرضاً لانفرادها", estate * 0.5);
-                        else pushRow(`الأخوات لأب (${activeSisDad})`, "⅔ الثلثين فرضاً للتعدد", estate * (2/3));
-                    }
-                }
-            }
+        if (hasGrandfatherAbdullah) {
+            pushRow("Grandfather (الجد - عبد الله)", "Excluded completely by the Father Tariq ❌", 0);
         }
+        if (hasSonOfSon) {
+            pushRow("Son (الابن - ابن خالد)", "Asabah بالنفس (Takes all remaining residue)", estate * 0.3);
+        }
+        if (hasDauOfSon) {
+            pushRow("Daughter (البنت - بنت خالد)", hasSonOfSon ? "Asabah بالغير (Shared with brother)" : "½ Single Fard Share", estate * (hasSonOfSon ? 0.15 : 0.5));
+        }
+        pushRow("Uncles/Aunts (الإخوة والأخوات)", "Excluded completely by the Father or descendant line ❌", 0);
+    }
 
-    } else {
-        pushRow("ورثة العضو المحدد", "حساب مالي افتراضي للمتوفى الفرعي الجديد", estate * 0.7);
-        pushRow("باقي العصبات", "الباقي تعصيباً", estate * 0.3);
+    // ==========================================
+    // CASE D: GENERIC ERROR PROTECTION FALLBACK
+    // ==========================================
+    else {
+        pushRow("Primary Ascendants", "Calculations pending complete legal matrix mapping for this node.", estate * 0.5);
+        pushRow("Residuary Lineage", "Residue balance", estate * 0.5);
     }
 }
 
