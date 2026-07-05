@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أكاديمية الفرائض التفاعلية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- القائمة الجانبية التفاعلية -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span>🏰 أكاديمية الفرائض</span>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" onclick="switchTab('main-tab')">🏠 شجرة العائلة والحاسبة</a>
+                <a href="#" class="menu-item" onclick="switchTab('lessons-tab')">📖 موسوعة علم الفرائض</a>
+                <a href="#" class="menu-item" onclick="switchTab('quiz-tab')">❓ بنك الأسئلة التفاعلي</a>
+            </nav>
+        </aside>
+
+        <!-- المحتوى الرئيسي للمنصة -->
+        <main class="main-content">
+            
+            <!-- التبويب الأول: الشجرة والحاسبة والجدول -->
+            <div id="main-tab" class="tab-content active-tab">
+                <div class="card welcome-card">
+                    <h2>أكاديمية الفرائض التفاعلية</h2>
+                    <p>الشجرة المطورة والمقسمة بصرياً لاستيعاب تعدد الإخوة والأخوات من جميع الجهات ودراسة حجب الحرمان والنقصان.</p>
+                </div>
+
+                <div class="card deceased-summary-card">
+                    <h3>💀 المورِّث الحالي (صاحب التركة)</h3>
+                    <div id="deceasedStatusInfo" class="deceased-info-badge">لم يتم اختيار المتوفى بعد</div>
+                </div>
+
+                <div class="card calc-card">
+                    <h3>💰 قيمة التركة الرقمية</h3>
+                    <div class="input-container">
+                        <input type="number" id="estateAmount" value="24000" oninput="calculateInheritance()" placeholder="مثال: 100000">
+                        <button class="action-btn" onclick="calculateInheritance()">احسب الآن</button>
+                    </div>
+                </div>
+
+                <div class="card tree-card">
+                    <h3>🌳 شجرة العائلة المنظمة والموسعة</h3>
+                    <p class="hint-text">💡 حددي المورث بالضغط على 💀، واضغطي على جسم الكارت لإخفاء الوارث (حجب أو وفاة مسبقة).</p>
+                    
+                    <div class="dynamic-tree">
+                        
+                        <!-- القسم 1: الأصول -->
+                        <div class="tree-section-label">1. الأصول (الأجداد والآباء)</div>
+                        <div class="tree-row">
+                            <div class="member-card alive" id="gFather" onclick="togglePresence('gFather', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">الجد (أبو الأب)</span>
+                                <button class="btn-die" onclick="setDeceased('gFather', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="father" onclick="togglePresence('father', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">الأب (عبد الله)</span>
+                                <button class="btn-die" onclick="setDeceased('father', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="mother" onclick="togglePresence('mother', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">الأم (آمنة)</span>
+                                <button class="btn-die" onclick="setDeceased('mother', event)">💀 متوفاة</button>
+                            </div>
+                        </div>
+
+                        <div class="tree-connector">↕️</div>
+
+                        <!-- القسم 2: المورث والزوجة -->
+                        <div class="tree-section-label">2. بيت المورِّث والزوجية</div>
+                        <div class="tree-row">
+                            <div class="member-card deceased-target" id="tariq" onclick="togglePresence('tariq', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">طارق (المورِّث) ⚰️</span>
+                                <button class="btn-die" onclick="setDeceased('tariq', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="wife" onclick="togglePresence('wife', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">الزوجة (فاطمة)</span>
+                                <button class="btn-die" onclick="setDeceased('wife', event)">💀 متوفاة</button>
+                            </div>
+                        </div>
+
+                        <div class="tree-connector">↕️</div>
+
+                        <!-- القسم 3: الحواشي - الإخوة الأشقاء -->
+                        <div class="tree-section-label">3. الحواشي: الإخوة والأخوات الأشقاء (من الأب والأم معاً)</div>
+                        <div class="tree-row row-siblings-sh">
+                            <div class="member-card alive" id="brother" onclick="togglePresence('brother', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ شقيق 1 (عمر)</span>
+                                <button class="btn-die" onclick="setDeceased('brother', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="brother2" onclick="togglePresence('brother2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ شقيق 2 (علي)</span>
+                                <button class="btn-die" onclick="setDeceased('brother2', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="sister" onclick="togglePresence('sister', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت شقيقة 1 (هند)</span>
+                                <button class="btn-die" onclick="setDeceased('sister', event)">💀 متوفاة</button>
+                            </div>
+                            <div class="member-card alive" id="sister2" onclick="togglePresence('sister2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت شقيقة 2 (لبنى)</span>
+                                <button class="btn-die" onclick="setDeceased('sister2', event)">💀 متوفاة</button>
+                            </div>
+                        </div>
+
+                        <!-- القسم 4: الحواشي - الإخوة لأب -->
+                        <div class="tree-section-label">4. الحواشي: الإخوة والأخوات لأب (من الأب فقط)</div>
+                        <div class="tree-row row-siblings-dad">
+                            <div class="member-card alive" id="broFather" onclick="togglePresence('broFather', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ لأب 1 (حمد)</span>
+                                <button class="btn-die" onclick="setDeceased('broFather', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="broFather2" onclick="togglePresence('broFather2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ لأب 2 (صالح)</span>
+                                <button class="btn-die" onclick="setDeceased('broFather2', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="sisFather" onclick="togglePresence('sisFather', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت لأب 1 (شمس)</span>
+                                <button class="btn-die" onclick="setDeceased('sisFather', event)">💀 متوفاة</button>
+                            </div>
+                            <div class="member-card alive" id="sisFather2" onclick="togglePresence('sisFather2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت لأب 2 (مريم)</span>
+                                <button class="btn-die" onclick="setDeceased('sisFather2', event)">💀 متوفاة</button>
+                            </div>
+                        </div>
+
+                        <!-- القسم 5: الحواشي - الإخوة لأم -->
+                        <div class="tree-section-label">5. الحواشي: الإخوة والأخوات لأم (من الأم فقط)</div>
+                        <div class="tree-row row-siblings-mom">
+                            <div class="member-card alive" id="broMother" onclick="togglePresence('broMother', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ لأم 1 (يوسف)</span>
+                                <button class="btn-die" onclick="setDeceased('broMother', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="broMother2" onclick="togglePresence('broMother2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخ لأم 2 (خليل)</span>
+                                <button class="btn-die" onclick="setDeceased('broMother2', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="sisMother" onclick="togglePresence('sisMother', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت لأم 1 (زينة)</span>
+                                <button class="btn-die" onclick="setDeceased('sisMother', event)">💀 متوفاة</button>
+                            </div>
+                            <div class="member-card alive" id="sisMother2" onclick="togglePresence('sisMother2', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">أخت لأم 2 (نور)</span>
+                                <button class="btn-die" onclick="setDeceased('sisMother2', event)">💀 متوفاة</button>
+                            </div>
+                        </div>
+
+                        <div class="tree-connector">↕️</div>
+
+                        <!-- القسم 6: الفروع والأحفاد -->
+                        <div class="tree-section-label">6. الفروع والأحفاد (أولاد الابن وأولاد البنت)</div>
+                        <div class="tree-row">
+                            <div class="member-card alive" id="son" onclick="togglePresence('son', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">الابن (خالد)</span>
+                                <button class="btn-die" onclick="setDeceased('son', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="daughter" onclick="togglePresence('daughter', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">البنت (سارة)</span>
+                                <button class="btn-die" onclick="setDeceased('daughter', event)">💀 متوفاة</button>
+                            </div>
+                            <div class="member-card alive" id="sonOfSon" onclick="togglePresence('sonOfSon', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">ابن الابن (ابن خالد)</span>
+                                <button class="btn-die" onclick="setDeceased('sonOfSon', event)">💀 متوفى</button>
+                            </div>
+                            <div class="member-card alive" id="dauOfSon" onclick="togglePresence('dauOfSon', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">بنت الابن (بنت خالد)</span>
+                                <button class="btn-die" onclick="setDeceased('dauOfSon', event)">💀 متوفاة</button>
+                            </div>
+                            <div class="member-card alive" id="sonOfDau" onclick="togglePresence('sonOfDau', event)">
+                                <div class="status-indicator"></div>
+                                <span class="m-role">ابن البنت (ابن سارة) ⚠️</span>
+                                <button class="btn-die" onclick="setDeceased('sonOfDau', event)">💀 متوفى</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- جدول الأنصبة المستخرج فقهياً -->
+                <div class="card table-card">
+                    <h3 id="resultsTitle">📊 جدول الأنصبة المستخرج فقهياً</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>الوارث</th>
+                                <th>القرابة والتكييف الفقهي للفرض أو الحجب</th>
+                                <th>النصيب المالي المستحق</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- يتم الضخ ديناميكياً بواسطة JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- التبويب الثاني: موسوعة علم الفرائض الكاملة -->
+            <div id="lessons-tab" class="tab-content">
+                <div class="card welcome-card">
+                    <h2>📖 موسوعة علم الفرائض والشروط الفقهية</h2>
+                    <p>دليل مرجعي متكامل لأحكام الإرث، الفروض المقدرة، وقواعد الحجب الكبرى لتعليم الطالبات.</p>
+                </div>
+
+                <div class="lessons-grid">
+                    <div class="lesson-card">
+                        <div class="lesson-badge badge-half">أركان وشروط الإرث</div>
+                        <h4>الأركان الثلاثة:</h4>
+                        <p>1. <strong>المورِّث:</strong> المتوفى حقيقة أو حكماً.<br>2. <strong>الوارث:</strong> الحي بعد موت المورِّث.<br>3. <strong>الحق الموروث:</strong> التركة المخلفة.</p>
+                    </div>
+                    
+                    <div class="lesson-card">
+                        <div class="lesson-badge badge-third">الفروض المقدرة كتاباً</div>
+                        <h4>الأنصبة الستة في القرآن:</h4>
+                        <p>• <strong>النصف (½) والثلثان (⅔):</strong> فروض الإناث والزوج عند الانفراد والتعدد.<br>• <strong>الربع (¼) والثمن (⅛):</strong> فروض الزوجية حسب وجود الفرع.<br>• <strong>الثلث (⅓) والسدس (⅙):</strong> فروض الأم والإخوة لأم والأصول عند الحجب.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-badge badge-sixth">قواعد الحجب الموسعة</div>
+                        <h4>الحرمان التام والنقصان:</h4>
+                        <p>• <strong>جهة الأب:</strong> تحجب الإخوة الأشقاء، ولأب، ولأم حجب حرمان تام.<br>• <strong>جهة الابن:</strong> تحجب أبناء الابن الأقل درجة، وجميع الإخوة والأخوات.<br>• <strong>أولاد البنت:</strong> يعتبرون من ذوي الأرحام ولا إرث لهم مع وجود أصحاب الفروض.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- التبويب الثالث: بنك الأسئلة التفاعلي المطور والموسع -->
+            <div id="quiz-tab" class="tab-content">
+                <div class="card welcome-card">
+                    <h2>❓ بنك الاختبارات الفورية وقواعد الحجب (موسع)</h2>
+                    <p>اضغطي على بطاقة السؤال لإظهار الإجابة والتعليل الفقهي فورا أمام الطالبات.</p>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س1: ما هو الفرق الفقهي في الإرث بين "ابن الابن" و "ابن البنت"؟</div>
+                        <div class="quiz-a">الإجابة: ابن الابن من العصبات (وارث بالقرابة والتعصيب)، بينما ابن البنت يعتبر من "ذوي الأرحام" الذين لا يرثون فرضاً ولا تعصيباً إلا عند انعدام الورثة تماماً.</div>
+                    </div>
+
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س2: كيف يؤثر وجود الأب المباشر على الإخوة لأم (من الأم فقط) والأشقاء؟</div>
+                        <div class="quiz-a">الإجابة: الأب المباشر يحجب جميع أنواع الإخوة (الأشقاء، ولأب، ولأم) حجب حرمان تام، ويسقط نصيبهم إلى الصفر.</div>
+                    </div>
+
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س3: متى ترث الأخت لأب (من الأب فقط) فرض السدس (⅙)؟</div>
+                        <div class="quiz-a">الإجابة: ترث الأخت لأب السدس فرضاً تكملة للثلثين إذا كانت مع أخت شقيقة واحدة وارثة لفرض النصف، بشرط عدم وجود أخ لأب يعصبها أو حاجب.</div>
+                    </div>
+
+                    <!-- الأسئلة الجديدة المضافة -->
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س4: ما هو تأثير وجود "جمع من الإخوة" (مثل أخوين أشقاء أو أختين لأم) على نصيب الأم؟</div>
+                        <div class="quiz-a">الإجابة: يحجبون الأم حجب نقصان؛ فينخفض نصيبها الفقهي من الثلث (⅓) إلى السدس (⅙)، سواء كان هؤلاء الإخوة وارثين أو محجوبين بغيرهم (حسب رأي جمهور الفقهاء).</div>
+                    </div>
+
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س5: إذا مات شخص عن "أخ شقيق" و"أخ لأب"، كيف تقسم التركة تعصيباً بينهما؟</div>
+                        <div class="quiz-a">الإجابة: يحوز الأخ الشقيق الباقي تعصيباً بالكامل، ويُحجب الأخ لأب حجب حرمان تماماً؛ لأن الأخ الشقيق أقوى قرابة (يدلي بالأب والأم معاً).</div>
+                    </div>
+
+                    <div class="quiz-card" onclick="toggleQuizAnswer(this)">
+                        <div class="quiz-q">س6: ما هي القاعدة المميزة لإرث الإخوة لأم (أولاد الأم) مقارنة بباقي الورثة الذكور والإناث؟</div>
+                        <div class="quiz-a">الإجابة: الذكر والأنثى في الإخوة لأم يتساوون في النصيب تماماً (للذكر مثل حظ الأنثى دون تفاضل)، كما أن ذكرهم لا يعصب أنثاهم، بل يرثون بالتساوي فرض السدس أو الثلث.</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
