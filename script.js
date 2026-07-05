@@ -1,5 +1,5 @@
 // Tab Switching Navigation
-function switchTab(tabId) {
+function switchTab(tabId, event) {
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active-tab');
     });
@@ -7,7 +7,9 @@ function switchTab(tabId) {
         item.classList.remove('active');
     });
     document.getElementById(tabId).classList.add('active-tab');
-    if(event) event.currentTarget.classList.add('active');
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
 }
 
 function toggleQuizAnswer(cardElement) {
@@ -40,7 +42,7 @@ const originalLabels = {
 };
 
 function setDeceased(memberId, event) {
-    event.stopPropagation();
+    if (event && event.stopPropagation) event.stopPropagation();
     currentDeceased = memberId;
     presenceStatus[memberId] = true; 
     
@@ -55,9 +57,11 @@ function setDeceased(memberId, event) {
     });
 
     const deadCard = document.getElementById(memberId);
-    deadCard.classList.remove('alive', 'not-present');
-    deadCard.classList.add('deceased-target');
-    deadCard.querySelector('.m-role').innerText = originalLabels[memberId] + " ⚰️";
+    if (deadCard) {
+        deadCard.classList.remove('alive', 'not-present');
+        deadCard.classList.add('deceased-target');
+        deadCard.querySelector('.m-role').innerText = originalLabels[memberId] + " ⚰️";
+    }
 
     calculateInheritance();
 }
@@ -67,12 +71,14 @@ function togglePresence(memberId, event) {
     presenceStatus[memberId] = !presenceStatus[memberId];
     const card = document.getElementById(memberId);
 
-    if (presenceStatus[memberId]) {
-        card.classList.remove('not-present');
-        card.classList.add('alive');
-    } else {
-        card.classList.remove('alive');
-        card.classList.add('not-present');
+    if (card) {
+        if (presenceStatus[memberId]) {
+            card.classList.remove('not-present');
+            card.classList.add('alive');
+        } else {
+            card.classList.remove('alive');
+            card.classList.add('not-present');
+        }
     }
     calculateInheritance();
 }
@@ -82,12 +88,15 @@ function calculateInheritance() {
     const tableBody = document.getElementById('tableBody');
     const resultsTitle = document.getElementById('resultsTitle');
     const deceasedStatusInfo = document.getElementById('deceasedStatusInfo');
-    const estate = parseFloat(document.getElementById('estateAmount').value) || 0;
+    const estateInput = document.getElementById('estateAmount');
+    const estate = estateInput ? (parseFloat(estateInput.value) || 0) : 0;
     
+    if (!tableBody) return;
     tableBody.innerHTML = ''; 
+    
     let currentName = originalLabels[currentDeceased];
-    resultsTitle.innerText = `📊 Faraidh Distribution Sheet for Deceased: [${currentName}]`;
-    deceasedStatusInfo.innerText = `Active Deceased: [ ${currentName} ] — Total Estate: ${estate.toFixed(2)}`;
+    if (resultsTitle) resultsTitle.innerText = `📊 Faraidh Distribution Sheet for Deceased: [${currentName}]`;
+    if (deceasedStatusInfo) deceasedStatusInfo.innerText = `Active Deceased: [ ${currentName} ] — Total Estate: ${estate.toFixed(2)}`;
 
     let isAlive = (role) => presenceStatus[role] && currentDeceased !== role;
 
@@ -216,6 +225,7 @@ function calculateInheritance() {
 
 function pushRow(relative, ruling, cash) {
     const tableBody = document.getElementById('tableBody');
+    if (!tableBody) return;
     const row = `
         <tr>
             <td><strong>${relative}</strong></td>
